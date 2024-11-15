@@ -5,6 +5,7 @@
 package forme;
 
 import controller.Controller;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -23,7 +24,8 @@ public class GlavnaForma extends javax.swing.JFrame {
     public GlavnaForma() {
         initComponents();
         kontroler = Controller.getInstance();
-        ModelTabeleKnjige modelTabele = new ModelTabeleKnjige(kontroler.getListaKnjiga());
+        //ModelTabeleKnjige modelTabele = new ModelTabeleKnjige(kontroler.getListaKnjiga());
+        ModelTabeleKnjige modelTabele = new ModelTabeleKnjige(kontroler.ucitajListuKnjigaIzBaze());
         jTableKnjige.setModel(modelTabele);
     }
 
@@ -47,8 +49,6 @@ public class GlavnaForma extends javax.swing.JFrame {
         jTextFieldAutor = new javax.swing.JTextField();
         jComboBoxZanr = new javax.swing.JComboBox<>();
         jLabelZanr = new javax.swing.JLabel();
-        jCheckBoxStrip = new javax.swing.JCheckBox();
-        jCheckBoxNaucniCasopis = new javax.swing.JCheckBox();
         jButtonFiltriraj = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -87,7 +87,7 @@ public class GlavnaForma extends javax.swing.JFrame {
             }
         });
 
-        jLabelNaziv.setText("Naziv: ");
+        jLabelNaziv.setText("Naslov:");
 
         jLabelAutor.setText("Autor: ");
 
@@ -101,11 +101,12 @@ public class GlavnaForma extends javax.swing.JFrame {
 
         jLabelZanr.setText("Zanr:");
 
-        jCheckBoxStrip.setText("Strip");
-
-        jCheckBoxNaucniCasopis.setText("Naucni Casopis");
-
         jButtonFiltriraj.setText("Filtriraj");
+        jButtonFiltriraj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFiltrirajActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -113,35 +114,28 @@ public class GlavnaForma extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(73, 73, 73)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelAutor)
+                            .addComponent(jLabelNaziv))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabelAutor)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextFieldAutor))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabelNaziv)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextFieldNaziv, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(40, 40, 40)
+                            .addComponent(jTextFieldNaziv, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                            .addComponent(jTextFieldAutor))
+                        .addGap(72, 72, 72)
                         .addComponent(jButtonFiltriraj, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabelZanr)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBoxZanr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jCheckBoxStrip)
-                                .addComponent(jCheckBoxNaucniCasopis))))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 665, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabelZanr)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jComboBoxZanr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE))
                 .addGap(47, 47, 47)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jButtonDodaj, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)
                     .addComponent(jButtonIzmeni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonObrisi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addGap(89, 89, 89))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,29 +143,24 @@ public class GlavnaForma extends javax.swing.JFrame {
                 .addGap(65, 65, 65)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelNaziv)
-                    .addComponent(jTextFieldNaziv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldNaziv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelAutor)
+                    .addComponent(jTextFieldAutor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonFiltriraj)
                     .addComponent(jComboBoxZanr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabelZanr))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabelAutor)
-                        .addComponent(jTextFieldAutor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButtonFiltriraj))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jCheckBoxStrip)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBoxNaucniCasopis)))
-                .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGap(55, 55, 55)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonObrisi, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(49, 49, 49)
-                        .addComponent(jButtonIzmeni, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonIzmeni, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(44, 44, 44)
                         .addComponent(jButtonDodaj, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         pack();
@@ -182,8 +171,10 @@ public class GlavnaForma extends javax.swing.JFrame {
         if(selektovaniRed == -1){
             JOptionPane.showMessageDialog(this,"Morate selektovati knjigu koju zelite obrisati!","Upozorenje",JOptionPane.WARNING_MESSAGE);   
         } else { 
+            ModelTabeleKnjige mtk = (ModelTabeleKnjige) jTableKnjige.getModel();
+            int id = mtk.getListaKnjiga().get(selektovaniRed).getId();
             Controller kontroler = Controller.getInstance();
-            kontroler.obrisiKnjigu(selektovaniRed);
+            kontroler.obrisiKnjigu(id);
             osveziTabelu();
         }
     }//GEN-LAST:event_jButtonObrisiActionPerformed
@@ -205,13 +196,30 @@ public class GlavnaForma extends javax.swing.JFrame {
         if(selektovaniRed == -1){
             JOptionPane.showMessageDialog(this,"Morate selektovati knjigu koju zelite izmeniti!","Upozorenje",JOptionPane.WARNING_MESSAGE);   
         } 
-        Knjiga selektovanaKnjiga = Controller.getInstance().getListaKnjiga().get(selektovaniRed);
+        // za lok mem
+        //Knjiga selektovanaKnjiga = Controller.getInstance().getListaKnjiga().get(selektovaniRed);
+        //za dbb
+        Knjiga selektovanaKnjiga = (Knjiga) kontroler.ucitajListuKnjigaIzBaze().get(selektovaniRed);
         FormaKnjiga fk = new FormaKnjiga(this,true,selektovanaKnjiga);
         fk.setResizable(false);
         fk.setLocationRelativeTo(null);
         fk.setVisible(true);
         
     }//GEN-LAST:event_jButtonIzmeniActionPerformed
+
+    private void jButtonFiltrirajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFiltrirajActionPerformed
+            String autor = jTextFieldAutor.getText();
+            String naslov = jTextFieldNaziv.getText();
+            //lok memorija
+            /*List<Knjiga> filtriranaLista = kontroler.filtriraj(autor,naslov);
+            
+            ModelTabeleKnjige mtk = new ModelTabeleKnjige(filtriranaLista);
+            jTableKnjige.setModel(mtk);*/
+            //iz baze
+            List<Knjiga> filtriranaLista2 = kontroler.filtriraj2(autor,naslov);
+            ModelTabeleKnjige mtk2 = new ModelTabeleKnjige(filtriranaLista2);
+            jTableKnjige.setModel(mtk2);
+    }//GEN-LAST:event_jButtonFiltrirajActionPerformed
 
     /**
      * @param args the command line arguments
@@ -222,8 +230,6 @@ public class GlavnaForma extends javax.swing.JFrame {
     private javax.swing.JButton jButtonFiltriraj;
     private javax.swing.JButton jButtonIzmeni;
     private javax.swing.JButton jButtonObrisi;
-    private javax.swing.JCheckBox jCheckBoxNaucniCasopis;
-    private javax.swing.JCheckBox jCheckBoxStrip;
     private javax.swing.JComboBox<String> jComboBoxZanr;
     private javax.swing.JLabel jLabelAutor;
     private javax.swing.JLabel jLabelNaziv;
@@ -233,45 +239,9 @@ public class GlavnaForma extends javax.swing.JFrame {
     private javax.swing.JTextField jTextFieldAutor;
     private javax.swing.JTextField jTextFieldNaziv;
     // End of variables declaration//GEN-END:variables
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GlavnaForma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GlavnaForma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GlavnaForma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GlavnaForma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JFrame frame = new GlavnaForma();
-                frame.setTitle("Biblioteka");
-                frame.setVisible(true);
-                frame.setLocationRelativeTo(null);
-                frame.setResizable(false);
-                
-            }
-        });
-    }
-
+    
     void osveziTabelu() {
-        ModelTabeleKnjige modelTabele = (ModelTabeleKnjige) jTableKnjige.getModel();
-        modelTabele.osveziPodatke(); 
+        ModelTabeleKnjige modelTabele = new ModelTabeleKnjige(kontroler.ucitajListuKnjigaIzBaze());
+        jTableKnjige.setModel(modelTabele);
     }
 }
